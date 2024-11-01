@@ -33,7 +33,23 @@ services:
     #  - backend_rds
     networks:
      - project-network
+    
+  rds_postgres:
+    image: postgres:alpine
+    ports:
+      - "8000:8000"
+    networks:
+      - project-network
 
+  redis_redis:
+    image: redis:alpine
+    ports:
+      - "8001:8001"
+    networks:
+      - project-network
+
+
+  
 networks:
   project-network:
     driver: bridge
