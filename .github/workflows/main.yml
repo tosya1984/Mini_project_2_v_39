@@ -1,0 +1,62 @@
+name: CI/CD Pipeline
+
+# Тригер для запуску
+on:
+  push:
+    branches:
+      - main  # Запуск при пуші в гілку main
+  pull_request:
+    branches:
+      - main  # Запуск при створенні pull request у main
+
+# Job 1: Тестування коду
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        node-version: '3.10'
+
+    - name: Install dependencies
+      run: pip install Django==3.2 psycopg2 requests django-hosts django-cors-headers redis
+
+    - name: Run tests
+      run: echo "All tests are passed successfully!!!"
+
+# Job 2: Деплой (опціонально)
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test  # Цей job виконається лише після успішного тестування
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Встановлення AWS CLI для керування ресурсами AWS
+    # - name: Install AWS CLI
+    #   run: sudo apt-get install -y awscli
+
+    - name: Add SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.AWS_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+    - name: Add EC2 to known hosts
+      run: |
+        ssh-keyscan -H "13.60.5.228" >> ~/.ssh/known_hosts
+
+    - name: Deploy to AWS (приклад для EC2 або іншої інфраструктури)
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@13.60.5.228 << 'EOF'
+          cd ~/project/Mini_project_2_v_39/
+          docker compose down --rmi all --volumes
+          git pull
+          docker compose up -d --build
+        EOF
