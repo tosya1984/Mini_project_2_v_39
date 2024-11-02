@@ -57,6 +57,7 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_DB=${REDIS_DB}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: redis-server --requirepass tosya134526
     build:
       context: ./Dynamic_services_static_front_project/redis
     ports:
