@@ -34,8 +34,13 @@ services:
     networks:
      - project-network
     
-  rds_postgres:
+  db_postgres:
     image: postgres:alpine
+    restart: always
+    shm_size: 128mb
+    environment:
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     build:
       context: ./Dynamic_services_static_front_project/postgres
     ports:
@@ -43,8 +48,15 @@ services:
     networks:
       - project-network
 
-  redis_redis:
+  db_redis:
     image: redis:alpine
+    restart: always
+    environment:
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+        # - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DB=${REDIS_DB}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     build:
       context: ./Dynamic_services_static_front_project/redis
     ports:
